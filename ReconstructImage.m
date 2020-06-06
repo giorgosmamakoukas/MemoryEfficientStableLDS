@@ -11,12 +11,13 @@ options.posdef = 10e-12;
 options.init = 0;
 options.maxiter = 500000;
 options.display = 0;
-
+    
 machine_tolerance = 10e-11;
 
 % Add path to dataset!
 addpath(data_path);
-DIMS = 3:30;
+DIMS = 3:30;    
+    
 
 for dim_i = 1:length(DIMS) % Run optimization for different levels of subspace dimension
     n = DIMS(dim_i);
