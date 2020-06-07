@@ -68,7 +68,7 @@ def main():
                     break
 
                 # save current frame as .jpg
-                name = f'{args.save_dir}{vid}/frame_' + str(currentFrame).zfill(5) + '.jpg'
+                name = f'{args.save_dir}{vid}/frame_' + str(currentFrame).zfill(10) + '.jpg'
                 cv2.imwrite(name, frame)
 
                 # move to next frame
