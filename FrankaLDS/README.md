@@ -1,1 +1,1 @@
-# Learning and control of Franka Emika Panda robot using stable LDS
+# Learning and control of the Franka robot using stable LDS
