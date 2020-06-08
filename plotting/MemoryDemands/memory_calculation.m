@@ -1,11 +1,11 @@
 clear; clc; close all;
 
-path_to_data = 'coffee_cup2/'; % change directory to data
+path_to_data = 'coffee_cup/'; % change directory to data
 
 dims = [10, 20, 40, 60, 80, 100, 150, 200, 250, 300];
 for i = 1 : length(dims)
     dim_i = dims(i);
-    load([path_to_data, 'Memory_Errors_and_Times_dim_', num2str(dim_i),'.mat']);
+    load([path_to_data, 'Memory_dim_', num2str(dim_i),'.mat']);
     SUBmem(i) = SUB.mem;
     CGmem(i) = CG.mem;
     WLSmem(i) = WLS.mem;
