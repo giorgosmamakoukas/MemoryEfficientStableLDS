@@ -1,5 +1,8 @@
 # Obtaining datasets
 
+# UCLA dataset
+The UCLA dataset can be obtained from this [link](https://drive.google.com/file/d/0BxMIVlhgRmcbN3pRa0dyaHpHV1E/view?usp=sharing). We use the file `ucla_patches.mat` to extract the frame sequences.
+
 # UCSD dataset
 To obtain the UCSD dataset that was used in the paper, you can visit the relevant [page](http://www.svcl.ucsd.edu/projects/traffic/) of the Statistical Visual Computing Lab at UCSD or download it directly from [here](http://www.svcl.ucsd.edu/projects/traffic/db/trafficdb.tgz). We use the file named `traffic_patches_reg.mat` to extract the frame sequences.
 
