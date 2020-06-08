@@ -1,6 +1,9 @@
 # MemoryEfficientStableLDS
 Codebase associated with paper "Learning Memory-Efficient Stable Linear Dynamical Systems for Prediction and Control"
 
+## Getting data
+To get the datasets, read the instructions in the `data` directory. The data for the Franka Emika Panda experiments is contained in the `FrankaLDS` directory. 
+
 ## Data preparation
 
 To prepare the datasets for the UCLA, UCSD and DynTex benchmarks, follow the instructions in the `prepare_data` directory.
