@@ -2,7 +2,7 @@
 clear;
 clc;
 
-data = 'dyntex';
+data = 'ucla';
 
 if strcmp(data, 'ucla')
     dataset = 'ucla/';

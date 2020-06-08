@@ -7,6 +7,8 @@ clear;
 numberSequences = 200; % number of frame sequences to be used
 folder_name = 'results'; % directory to save results (will be created)
 data_path = '/path/to/data'; % path to directory containing .mat frame sequences
+path_to_algorithms = 'algorithms/'; % path to stable LDS algorithms
+
 DIMS = 3:30; % subspace dimensions for which you want to run algorithms
 
 % set standard config options
@@ -20,7 +22,9 @@ machine_tolerance = 10e-11;
 
 % add data_path to working directory
 addpath(data_path);
-   
+addpath(path_to_algorithms);
+mkdir(folder_name);
+
 % loop over subspace dimensions
 for dim_i = 1:length(DIMS) 
     n = DIMS(dim_i);
@@ -115,7 +119,6 @@ for dim_i = 1:length(DIMS)
         end
         
         % store results to dik
-        mkdir(folder_name);
         save([folder_name, '/Errors_and_Times_dim_', num2str(n),'.mat'], 'CG', 'WLS', 'SUB', 'LS');
     end
 end
