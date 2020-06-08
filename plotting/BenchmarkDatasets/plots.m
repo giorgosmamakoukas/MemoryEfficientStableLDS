@@ -35,8 +35,6 @@ for i = 1 : N_dims
     filename = [dataset, 'Errors_and_Times_dim_', num2str(indx), '.mat'];
     load(filename);
     
-    sum(round(LS.error - WLS.error, precision_decimal_digits) > 0)
-
     SUB.error = round(SUB.error, precision_decimal_digits);
     WLS.error = round(WLS.error, precision_decimal_digits);
     CG.error = round(CG.error, precision_decimal_digits);
