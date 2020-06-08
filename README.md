@@ -13,3 +13,5 @@ To prepare the datasets for the UCLA, UCSD and DynTex benchmarks, follow the ins
 To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need to run the `ReconstructImage.m` file. **NOTE**: you will need to set the configuration options at the top of the file so that it can work on your particular system.
 
 ## Learning and control on Franka Emika Panda
+
+For our results of Franka Emika Panda, consult the `FrankaLDS` directroy.
