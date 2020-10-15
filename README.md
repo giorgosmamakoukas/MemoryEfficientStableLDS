@@ -1,4 +1,4 @@
-# MemoryEfficientStableLDS
+# Introduction
 Codebase for replicating experiments in the NeurIPS 2020 [paper](https://arxiv.org/abs/2006.03937) "Memory-Efficient Learning of Stable Linear Dynamical Systems for Prediction and Control" by [Giorgos Mamakoukas](https://gmamakoukas.com/), [Orest Xherija](https://github.com/orestxherija) and [Todd D. Murphey](https://murpheylab.github.io/people/toddmurphey.html).
 
 ## Getting data
