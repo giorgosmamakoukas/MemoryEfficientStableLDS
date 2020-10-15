@@ -14,9 +14,7 @@ If you have `wget` already installed in your machine, you can use the `get_dynte
 ```
 bash get_dyntex.sh /path/to/store/downloaded/videos/ DynTex_IDs.txt
 ```
-The file `DynTex_IDs.txt` (inluded in this repository) contains the names of the video files that we used in our experiments (without the `.avi` extension). `/path/to/store/downloaded/videos/` will be the local directory in which you wish to store the downloaded `.avi` videos, which will be created in case it does not already exist. 
-
-Once you run the above command, you will be prompted to provide the username and password that you obtained with the registration process and the downloading process will begin.
+The file `DynTex_IDs.txt` (inluded in this repository) contains the names of the video files that we used in our experiments (without the `.avi` extension). `/path/to/store/downloaded/videos/` will be the local directory in which you wish to store the downloaded `.avi` videos, which will be created in case it does not already exist. Once you run the above command, you will be prompted to provide the username and password that you obtained with the registration process and the downloading will begin.
 
 
 If you are using a MacOS, you will most likely need to install `wget` prior to executing the above commands. If you are using `Homebrew` as your package manager, you can easily install `wget` with
