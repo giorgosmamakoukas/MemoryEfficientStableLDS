@@ -1,5 +1,5 @@
 addpath('Functions')
-load([path_to_training_data, 'FrankaExperimentalData.mat']);
+load([path_to_training_data, 'FrankaTrainingData.mat']);
 
 Ps0_list = nan(length(nTrainingSamples),nStates + nControl);
 Psi_list = nan(length(nTrainingSamples),nStates + nControl);
