@@ -2,18 +2,19 @@
 clear;
 clc;
 
+path_to_data = '../../data/DynamicTexture/';
 data = 'ucla';
 
 if strcmp(data, 'ucla')
-    dataset = 'ucla/';
+    dataset = [path_to_data,'ucla/'];
     Nvideos = 200;
     dims = 3:30;
 elseif strcmp(data, 'ucsd') 
-    dataset = 'ucsd/';
+    dataset = [path_to_data, 'ucsd/'];
     Nvideos = 254;
     dims = 3:30;
 elseif strcmp(data, 'dyntex')
-    dataset = 'dyntex/';
+    dataset = [path_to_data, 'dyntex/'];
     dims = 3:30;
     Nvideos = 99;
 end

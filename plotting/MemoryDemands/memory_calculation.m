@@ -1,6 +1,6 @@
 clear; clc; close all;
 
-path_to_data = 'coffee_cup/'; % change directory to data
+path_to_data = '../../data/MemoryDemands/coffee_cup/'; % change directory to data
 
 dims = [10, 20, 40, 60, 80, 100, 150, 200, 250, 300];
 for i = 1 : length(dims)
