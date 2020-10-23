@@ -1,17 +1,10 @@
 # Introduction
+Animations for the results presented in the NeurIPS 2020 [paper](https://arxiv.org/abs/2006.03937) "Memory-Efficient Learning of Stable Linear Dynamical Systems for Prediction and Control"
+
+- [Coffee Cup](https://drive.google.com/file/d/1S703SFNdTnZ4otC0LT_DAEZetDLpd9kB/view?usp=sharing)
+- [Fountain](https://drive.google.com/file/d/1d2zLUot7Qu0QoXGTFnp9e5u8404H5FKT/view?usp=sharing)
+- [Steam](https://drive.google.com/file/d/1kTzWq8N9BQajRCmEOKSW-3lPYuD2fJdU/view?usp=sharing)
+- [Control of robotic arm](https://drive.google.com/file/d/1rM7jOgkPuBxEDnSpC3mgSLzbaIVSa0kr/view?usp=sharing)
 Codebase for replicating experiments in the NeurIPS 2020 [paper](https://arxiv.org/abs/2006.03937) "Memory-Efficient Learning of Stable Linear Dynamical Systems for Prediction and Control" by [Giorgos Mamakoukas](https://gmamakoukas.com/), [Orest Xherija](https://github.com/orestxherija) and [Todd D. Murphey](https://murpheylab.github.io/people/toddmurphey.html).
 
-## Getting data
-To get the datasets, read the instructions in the `data` directory. The data for the Franka Emika Panda experiments is contained in the `FrankaLDS` directory. 
 
-## Data preparation
-
-To prepare the datasets for the UCLA, UCSD and DynTex benchmarks, follow the instructions in the `prepare_data` directory.
-
-## Learning LDS for UCLA, UCSD and DynTex
-
-To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need to run the `ReconstructImage.m` file. **NOTE**: you will need to set the configuration options at the top of the file so that it can work on your particular system.
-
-## Learning and control on Franka Emika Panda
-
-For our results of Franka Emika Panda, consult the `FrankaLDS` directory.
