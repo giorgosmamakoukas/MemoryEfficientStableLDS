@@ -1,14 +1,14 @@
-function [A, Bcon, error, memory_used] = learnSOCmodel_withControl(X, Y, Ucon, options)
+function [A, B, error, memory_used] = learnSOCmodel_withControl(X, Y, U, options)
 
-XU = [X; Ucon];
+XU = [X; U];
 n = size(X,1); 
 % nA2 = norm(Y,'fro')^2; 
 
 XYtr = X * Y';
 XXt = X * X';
-XUtr = X * Ucon';
-YUtr = Y * Ucon';
-UUtr = Ucon * Ucon';
+XUtr = X * U';
+YUtr = Y * U';
+UUtr = U * U';
 
 % Options 
 if nargin <= 1
@@ -48,19 +48,19 @@ e100 = nan(100,1); % Preallocate for speed
     S = eye(n); 
     AB_ls = Y*pinv(XU);
     nA2 = norm(Y - AB_ls*XU,'fro')^2/2; 
-    [U,B] = poldec(AB_ls(1:n, 1:n)); % Y = K*X, so K = Y * pinv(X);
+    [O,C] = poldec(AB_ls(1:n, 1:n)); % Y = K*X, so K = Y * pinv(X);
     try
-        % sometimes, due to numerics U*B can be stable, but S\U*B*S may not
+        % sometimes, due to numerics O*C can be stable, but S\O*C*S may not
         % -- theoretically, that is not possible. 
-        eA = abs(eigs(S\U*B*S, 1, 'lm', 'MaxIterations', 1000, 'SubspaceDimension', n));
+        eA = abs(eigs(S\O*C*S, 1, 'lm', 'MaxIterations', 1000, 'SubspaceDimension', n));
     catch
-        % fprintf('Max eigenvalue not converged. Project B matrix \n');
+        % fprintf('Max eigenvalue not converged. Project C matrix \n');
         eA = 2; %anything larger than 1
     end
-    Bcon = AB_ls(1:n, n+1:end);
+    B = AB_ls(1:n, n+1:end);
     if eA > 1 - options.astab
-        B = projectPSD(B,0,1-options.astab);
-        e_old = norm(Y - (S\ U * B* S) * X - Bcon*Ucon, 'fro')^2/2;
+        C = projectPSD(C,0,1-options.astab);
+        e_old = norm(Y - (S\ O * C* S) * X - B*U, 'fro')^2/2;
     else
         e_old = norm(Y - AB_ls*XU, 'fro')^2/2;
     end
@@ -68,12 +68,12 @@ e100 = nan(100,1); % Preallocate for speed
     % LMI-based initialization
     maxeA = max(1,eA); 
     Astab = (AB_ls(1:n,1:n))/maxeA; 
-    [~,Stemp,Utemp,Btemp] = checkdstable(0.9999*Astab, options.astab); 
-    etemp = norm(Y - (Stemp\ Utemp * Btemp* Stemp) * X - Bcon * Ucon, 'fro')^2/2;
+    [~,Stemp,Otemp,Ctemp] = checkdstable(0.9999*Astab, options.astab); 
+    etemp = norm(Y - (Stemp\ Otemp * Ctemp* Stemp) * X - B * U, 'fro')^2/2;
     if etemp < e_old
         S = Stemp; 
-        U = Utemp;
-        B = Btemp;
+        O = Otemp;
+        C = Ctemp;
         e_old = etemp;
     end
     
@@ -81,8 +81,6 @@ e100 = nan(100,1); % Preallocate for speed
 
 
 options.alpha0 = 0.5; % Parameter of FGM, can be tuned. 
-% options.lsparam = 1.5;
-% options.lsitermax = 30; 
 options.lsparam = 1.5;
 options.lsitermax = 60; 
 options.gradient = 0; 
@@ -91,9 +89,9 @@ i = 1;
 
 alpha = options.alpha0;
 Ys = S; 
-Yu = U; 
-Yb = B; 
-Yb_con = Bcon;
+Yo = O; 
+Yc = C; 
+Yb = B;
 restarti = 1; 
 begintime0 = clock; 
 
@@ -106,58 +104,58 @@ while i < options.maxiter
     alpha_prev = alpha;
     
     % Compute gradient
-    Atemp = S \ U * B * S;	
-    Z = - (XYtr - XXt * Atemp' - XUtr*Bcon') /S;	
-    gS = (Z*U*B - Atemp * Z)';	
-    gU = (B*S*Z)';	
-    gB = (S*Z*U)';
-    gBcon = (Atemp * XUtr + Bcon *UUtr - YUtr); 
+    Atemp = S \ O * C * S;	
+    Z = - (XYtr - XXt * Atemp' - XUtr*B') /S;	
+    gS = (Z*O*C - Atemp * Z)';	
+    gO = (C*S*Z)';	
+    gC = (S*Z*O)';
+    gB = (Atemp * XUtr + B *UUtr - YUtr); 
                 
     inneriter = 1; 
     step = 1;
     
         % For i == 1, we always have a descent direction
         Sn = Ys - gS*step;
-        Un = Yu - gU*step; 
-        Bn = Yb - gB*step; 
-        Bn_con = Yb_con - gBcon * step;
+        On = Yo - gO*step; 
+        Cn = Yc - gC*step; 
+        Bn = Yb - gB * step;
         % Project onto feasible set
         Sn = projectInvertible(Sn,options.posdef);
         
         try
-            maxE = abs(eigs(Sn\Un*Bn*Sn, 1, 'lm', 'MaxIterations', 1000, 'SubspaceDimension', n));
+            maxE = abs(eigs(Sn\On*Cn*Sn, 1, 'lm', 'MaxIterations', 1000, 'SubspaceDimension', n));
         catch
-            % fprintf('Max eigenvalue not converged. Project Un and Bn matrices \n');
+            % fprintf('Max eigenvalue not converged. Project On and Cn matrices \n');
             maxE = 2; %anything larger than 1
         end
         if  maxE > 1 - options.astab
-            Un = poldec(Un); 
-            Bn = projectPSD(Bn,0,1-options.astab); 
+            On = poldec(On); 
+            Cn = projectPSD(Cn,0,1-options.astab); 
         end
-        e_new = norm(Y - (Sn\ Un * Bn* Sn) * X - Bn_con * Ucon, 'fro')^2/2;
+        e_new = norm(Y - (Sn\ On * Cn* Sn) * X - Bn * U, 'fro')^2/2;
     
 % Barzilai and Borwein
     while (e_new > e_old) && (inneriter <= options.lsitermax) 
         % For i == 1, we always have a descent direction
         Sn = Ys - gS*step;
-        Un = Yu - gU*step; 
-        Bn = Yb - gB*step;
-        Bn_con = Yb_con - gBcon * step;
+        On = Yo - gO*step; 
+        Cn = Yc - gC*step;
+        Bn = Yb - gB * step;
         % Project onto feasible set
         Sn = projectInvertible(Sn,options.posdef);
         
         try 
-            maxE = abs(eigs(Sn\Un*Bn*Sn, 1, 'lm', 'MaxIterations', 1000, 'SubspaceDimension', n));
+            maxE = abs(eigs(Sn\On*Cn*Sn, 1, 'lm', 'MaxIterations', 1000, 'SubspaceDimension', n));
         catch
-            % fprintf('Max eigenvalue not converged. Project Un and Bn matrices \n');
+            % fprintf('Max eigenvalue not converged. Project On and Cn matrices \n');
             maxE = 2; %anything larger than 1
         end
             
         if  maxE > 1 - options.astab
-            Un = poldec(Un); 
-            Bn = projectPSD(Bn,0,1-options.astab); 
+            On = poldec(On); 
+            Cn = projectPSD(Cn,0,1-options.astab); 
         end
-        e_new = norm(Y - (Sn\ Un * Bn* Sn) * X - Bn_con * Ucon, 'fro')^2/2;
+        e_new = norm(Y - (Sn\ On * Cn* Sn) * X - Bn * U, 'fro')^2/2;
         
         if e_new < e_old && e_new > prev_error
             break;
@@ -186,9 +184,9 @@ while i < options.maxiter
             restarti = 0;
             alpha = options.alpha0; 
             Ys = S;
-            Yu = U;
+            Yo = O;
+            Yc = C;
             Yb = B;
-            Yb_con = Bcon;
             e_new = e_old;
 %             % Reinitialize step length
         elseif restarti == 0 % no previous restart and no descent direction => converged 
@@ -203,14 +201,14 @@ while i < options.maxiter
             beta = 0; 
         end
         Ys = Sn + beta*(Sn-S); 
-        Yu = Un + beta*(Un-U);
-        Yb = Bn + beta*(Bn-B);
-        Yb_con = Bn_con + beta*(Bn_con - Bcon);
+        Yo = On + beta*(On-O);
+        Yc = Cn + beta*(Cn-C);
+        Yb = Bn + beta*(Bn - B);
         % Keep new iterates in memory 
         S = Sn;
-        U = Un;
+        O = On;
+        C = Cn;
         B = Bn;
-        Bcon = Bn_con;
     end
     i = i+1;
         
@@ -228,7 +226,7 @@ end
 
 % Refine solution
 
-    A = S\U*B*S;
+    A = S\O*C*S;
 
     % Move in direction of unstable A until you meet the stability boundary (to
     % decrease error)
@@ -236,13 +234,13 @@ end
     e_step = 0.00001;
     e = e0;
     n = length(A);
-%     AB_ls = Y*pinv([X; Ucon]);
-    grad = AB_ls - [A, Bcon];
+%     AB_ls = Y*pinv([X; U]);
+    grad = AB_ls - [A, B];
 
 %     A_ls = AB_ls(1:n, 1:n);
 %     B_ls = AB_ls(1:n, n+1:end);
 
-    AB_new = [A, Bcon] + e * grad; 
+    AB_new = [A, B] + e * grad; 
     Anew = AB_new(1:n,1:n);
 
 
@@ -258,7 +256,7 @@ end
     while (maxE < 1) && norm(AB_ls - AB_new,'fro')^2/2 > 0.01 % unstable operator
         e = e+e_step;
 
-        AB_new = [A, Bcon] + e*grad;
+        AB_new = [A, B] + e*grad;
         Anew = AB_new(1:n, 1:n); 
         try
             maxE = abs(eigs(Anew, 1, 'lm', 'MaxIterations', 1000, 'SubspaceDimension', n));
@@ -268,9 +266,9 @@ end
         end
     end
     if e ~= e0
-        ABtemp = [A, Bcon] + (e-e_step) * grad;
+        ABtemp = [A, B] + (e-e_step) * grad;
         A = ABtemp(1:n, 1:n);
-        Bcon = ABtemp(1:n, n+1:end);
+        B = ABtemp(1:n, n+1:end);
     end
     
     stored_var = whos();
@@ -279,7 +277,7 @@ end
         memory_used = memory_used + stored_var(i).bytes;	
     end
 
-    error = norm(Y - A * X - Bcon * Ucon, 'fro')^2/2;
+    error = norm(Y - A * X - B * U, 'fro')^2/2;
 end
 
 % Project the matrix Q onto the PSD cone 
@@ -355,15 +353,15 @@ end
 
 end
 
-function [P,S,U,B] = checkdstable(A, epsilon) 
+function [P,S,O,C] = checkdstable(A, epsilon) 
 
 n = length(A); 
 P = dlyap(A',eye(n)); 
 if nargout >= 3
     S = sqrtm(P); 
-    UB = S*A/S; 
-    [U,B] = poldec(UB); 
-    B = projectPSD(B,0,1 - epsilon); 
+    OC = S*A/S; 
+    [O,C] = poldec(OC); 
+    C = projectPSD(C,0,1 - epsilon); 
 end
 end
 
