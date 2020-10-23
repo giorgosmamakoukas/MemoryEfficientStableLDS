@@ -1,4 +1,4 @@
-# Introduction
+# Animations
 Animations for the results presented in the NeurIPS 2020 [paper](https://arxiv.org/abs/2006.03937) "Memory-Efficient Learning of Stable Linear Dynamical Systems for Prediction and Control"
 
 - [Coffee Cup](https://drive.google.com/file/d/1S703SFNdTnZ4otC0LT_DAEZetDLpd9kB/view?usp=sharing)
