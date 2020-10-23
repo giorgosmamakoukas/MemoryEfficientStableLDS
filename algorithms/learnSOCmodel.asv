@@ -43,16 +43,16 @@ e100 = nan(100,1); % Preallocate for speed
     S = eye(n); 
     A_ls = Y*pinv(X); 
     nA2 = norm(Y - A_ls*X,'fro')^2/2; 
-    [O,C] = poldec(A_ls); % Y = K*X, so K = Y * pinv(X);
+    [U,C] = poldec(A_ls); % Y = K*X, so K = Y * pinv(X);
     try
-        eA = abs(eigs(O*C, 1, 'lm', 'MaxIterations', 3000, 'SubspaceDimension', n));
+        eA = abs(eigs(U*C, 1, 'lm', 'MaxIterations', 3000, 'SubspaceDimension', n));
     catch
         fprintf('Max eigenvalue not converged. Project C matrix \n');
         eA = 2; %anything larger than 1
     end
     if eA > 1
         C = projectPSD(C,0,1-options.astab);
-        e_old = norm(Y - (S\ O * C* S) * X, 'fro')^2/2;
+        e_old = norm(Y - (S\ U * C* S) * X, 'fro')^2/2;
     else
         e_old = norm(Y - A_ls*X, 'fro')^2/2;
     end
@@ -65,7 +65,7 @@ e100 = nan(100,1); % Preallocate for speed
     etemp = norm(Y - (Stemp\ Utemp * Btemp* Stemp) * X, 'fro')^2/2;
     if etemp < e_old
         S = Stemp; 
-        O = Utemp;
+        U = Utemp;
         C = Btemp;
         e_old = etemp;
     end
@@ -82,7 +82,7 @@ i = 1;
 
 alpha = options.alpha0;
 Ys = S; 
-Yo = O; 
+Yu = U; 
 Yc = C; 
 restarti = 1; 
 begintime0 = clock; 
@@ -96,53 +96,53 @@ while i < options.maxiter
     alpha_prev = alpha;
     
     % Compute gradient
-    Atemp = S \ O * C * S;	
+    Atemp = S \ U * C * S;	
     Z = - (XYtr - XXt * Atemp' ) /S;	
-    gS = (Z*O*C - Atemp * Z)';	
+    gS = (Z*U*C - Atemp * Z)';	
     gU = (C*S*Z)';	
-    gB = (S*Z*O)';
+    gB = (S*Z*U)';
 
     inneriter = 1; 
     step = 100;
     
         % For i == 1, we always have a descent direction
         Sn = Ys - gS*step;
-        On = Yo - gU*step; 
+        Un = Yu - gU*step; 
         Cn = Yc - gB*step; 
         % Project onto feasible set
         Sn = projectInvertible(Sn,options.posdef);
         
         try
-            maxE = abs(eigs(On*Cn, 1, 'lm', 'MaxIterations', 3000, 'SubspaceDimension', n));
+            maxE = abs(eigs(Un*Cn, 1, 'lm', 'MaxIterations', 3000, 'SubspaceDimension', n));
         catch
             maxE = 2; %anything larger than 1
         end
         if  maxE > 1
-            On = poldec(On); 
+            Un = poldec(Un); 
             Cn = projectPSD(Cn,0,1-options.astab); 
         end
-        e_new = norm(Y - (Sn\ On * Cn* Sn) * X, 'fro')^2/2;
+        e_new = norm(Y - (Sn\ Un * Cn* Sn) * X, 'fro')^2/2;
     
 % Barzilai and Borwein
     while (e_new > e_old) && (inneriter <= options.lsitermax) 
         % For i == 1, we always have a descent direction
         Sn = Ys - gS*step;
-        On = Yo - gU*step; 
+        Un = Yu - gU*step; 
         Cn = Yc - gB*step; 
         % Project onto feasible set
         Sn = projectInvertible(Sn,options.posdef);
         
         try 
-            maxE = abs(eigs(On*Cn, 1, 'lm', 'MaxIterations', 3000, 'SubspaceDimension', n));
+            maxE = abs(eigs(Un*Cn, 1, 'lm', 'MaxIterations', 3000, 'SubspaceDimension', n));
         catch
             maxE = 2; %anything larger than 1
         end
             
         if  maxE > 1
-            On = poldec(On); 
+            Un = poldec(Un); 
             Cn = projectPSD(Cn,0,1-options.astab); 
         end
-        e_new = norm(Y - (Sn\ On * Cn* Sn) * X, 'fro')^2/2;
+        e_new = norm(Y - (Sn\ Un * Cn* Sn) * X, 'fro')^2/2;
         
         if e_new < e_old && e_new > prev_error
             break;
@@ -171,7 +171,7 @@ while i < options.maxiter
             restarti = 0;
             alpha = options.alpha0; 
             Ys = S;
-            Yo = O;
+            Yu = U;
             Yc = C;
             e_new = e_old;          
         elseif restarti == 0 % no previous restart and no descent direction => converged 
@@ -185,11 +185,11 @@ while i < options.maxiter
             beta = 0; 
         end
         Ys = Sn + beta*(Sn-S); 
-        Yo = On + beta*(On-O);
+        Yu = Un + beta*(Un-U);
         Yc = Cn + beta*(Cn-C);
         % Keep new iterates in memory 
         S = Sn;
-        O = On;
+        U = Un;
         C = Cn;
     end
     i = i+1;
@@ -208,7 +208,7 @@ end
 
 % Refine solution 
 
-A = S\O*C*S;
+A = S\U*C*S;
 
 % Move in direction of unstable A until you meet the stability boundary (to
 % decrease error)
@@ -307,14 +307,14 @@ end
 
 end
 
-function [P,S,O,C] = checkdstable(A) 
+function [P,S,U,C] = checkdstable(A) 
 
 n = length(A); 
 P = dlyap(A',eye(n)); 
 if nargout >= 3
     S = sqrtm(P); 
     UB = S*A/S; 
-    [O,C] = poldec(UB); 
+    [U,C] = poldec(UB); 
     C = projectPSD(C,0,1); 
 end
 end
