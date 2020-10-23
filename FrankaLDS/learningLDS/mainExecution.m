@@ -29,6 +29,7 @@ clear; close all; clc; system = 'Franka';
 
 path_to_training_data = '../experimentalData/trainingData/';
 algorithms_path = '../../algorithms/'; % path for stable LDS algorithms
+save_directory = 'results/';
 
 addpath(algorithms_path);
 options.graphic = 0;
@@ -88,7 +89,7 @@ for randomShuffling = 0 : 1
 
         fprintf('    Max eigenvalue is : %.4f \n', maxeval_LS);
         fprintf('    Reconstruction error : %.5f \n', e_LS);
-        save([saveName, 'Data_LS_', system], 'LS');
+        save([save_directory, saveName, 'Data_LS_', system], 'LS');
 
 
         %% Compute SUB (stable) [A, B] solution
@@ -109,7 +110,7 @@ for randomShuffling = 0 : 1
 
         fprintf('    Max eigenvalue is : %.4f \n', maxeval_SUB);
         fprintf('    Reconstruction error : %.5f \n', e_SUB);    
-        save([saveName,'Data_SUB_', system], 'SUB');
+        save([save_directory, saveName,'Data_SUB_', system], 'SUB');
 
         %% Compute WLS (stable) [A, B] solution
         fprintf('Computing stable A solution using WLS ... \n');
@@ -135,7 +136,7 @@ for randomShuffling = 0 : 1
         WLS.maxeval(nTraining,:) = [nTrainingSamples, maxeval_WLS];
         fprintf('    Max eigenvalue is : %.4f \n', max(abs(eig(A_WLS)) ));
         fprintf('    Reconstruction error : %.5f \n', e_WLS);    
-        save([saveName,'Data_WLS_', system], 'WLS');    % clearvars -except system
+        save([save_directory, saveName,'Data_WLS_', system], 'WLS');    % clearvars -except system
 
         %% Compute CG (stable) [A, B] solution
         fprintf('Computing stable A using CG ... \n');
@@ -154,7 +155,7 @@ for randomShuffling = 0 : 1
 
         fprintf('    Max eigenvalue is : %.4f \n', maxeval_CG)
         fprintf('    Reconstruction error : %.5f \n', e_CG);    
-        save([saveName,'Data_CG_', system], 'CG');  
+        save([save_directory, saveName,'Data_CG_', system], 'CG');  
 
     end
 end

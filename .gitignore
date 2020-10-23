@@ -130,3 +130,9 @@ dmypy.json
 
 # OS specific
 *.DS_Store
+
+# Directories
+Private/*
+
+# Pdf
+*.pdf
