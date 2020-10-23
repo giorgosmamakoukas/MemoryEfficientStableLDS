@@ -14,4 +14,4 @@ To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need
 
 ## Learning and control on Franka Emika Panda
 
-For our results of Franka Emika Panda, consult the `FrankaLDS` directroy.
+For our results of Franka Emika Panda, consult the `FrankaLDS` directory.
