@@ -6,11 +6,11 @@ dims = [10, 20, 40, 60, 80, 100, 150, 200, 250, 300];
 for i = 1 : length(dims)
     dim_i = dims(i);
     load([path_to_data, 'Memory_dim_', num2str(dim_i),'.mat']);
-    SUBmem(i) = SUB.mem;
+    SOCmem(i) = SOC.mem;
     CGmem(i) = CG.mem;
     WLSmem(i) = WLS.mem;
 %     stableLS(i) = LS.stability
-    clear WLS SUB CG
+    clear WLS SOC CG
 end
 
 %%
@@ -18,7 +18,7 @@ close all;
 KBToMB = 1/2^20;
 semilogy(dims, CGmem * KBToMB, ':o', 'linewidth', 1.5); hold on;
 semilogy(dims, WLSmem * KBToMB,'--*', 'linewidth', 1.5); hold on;
-semilogy(dims, SUBmem * KBToMB, '-s', 'linewidth', 1.5); hold on;
+semilogy(dims, SOCmem * KBToMB, '-s', 'linewidth', 1.5); hold on;
 semilogy(dims, dims.^4 * 8 * KBToMB,'--k', 'linewidth', 1.5); hold on;
 semilogy(dims, dims.^2 * 8 * KBToMB,'--k', 'linewidth', 1.5);
 xlabel('dimensions r')
