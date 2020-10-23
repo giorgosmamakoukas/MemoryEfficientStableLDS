@@ -27,7 +27,7 @@
 
 clear; close all; clc; system = 'Franka';
 
-path_to_training_data = '../experimentalData/trainingData/';
+path_to_training_data = '';
 algorithms_path = '../../algorithms/'; % path for stable LDS algorithms
 save_directory = 'results/';
 
