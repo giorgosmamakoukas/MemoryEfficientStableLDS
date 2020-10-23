@@ -3,7 +3,7 @@
 clc; clear; close all;
 color_order = get(gca,'colororder');
 
-filename = 'Franka_Fig8_exp';
+filename = '../../data/Franka_ControlExperiments';
 load(filename);
 X_d = desired_trajectory;
 for i =  1 : 3
