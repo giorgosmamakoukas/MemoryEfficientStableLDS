@@ -106,8 +106,8 @@ def main():
 
     # learn SOC model
     t_0 = time.time()
-    # A, mem = soc.learn_stable_soc(X=X, Y=Y, **params)
-    A, mem = numpy.identity(X.shape[0]), numpy.nan
+    A, mem = soc.learn_stable_soc(X=X, Y=Y, **params)
+    # A, mem = numpy.identity(X.shape[0]), numpy.nan
     t_1 = time.time()
     
     # compute least-squares error
