@@ -8,16 +8,7 @@ import numpy
 
 import utilities
 
-# import soc
-
-
-"""
-NOTES:
-1. To make the algorithm maximally parallelizable, we will make it so that the training file accepts one dimension and one data matrix at a time and stores the results in a directory corresponding to the particular dimension
-2. fix params dict
-3. ensure that matrices and transposes are correctly provided as per MATLAB
-4. double check command line arguments
-"""
+import soc
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -75,6 +66,7 @@ def main():
     # add trailing / to input and output directories if necessary
     if not args.save_dir.endswith('/'):
         args.save_dir += '/'
+    args.save_dir += str(args.subspace_dim) + '/'
 
     # make target directory if it does not exist
     os.makedirs(args.save_dir, exist_ok=True)
@@ -90,14 +82,27 @@ def main():
     data = numpy.load(args.data)
 
     # get algorithm parameters
-    params = {}
+    params = {
+        'log_memory' : args.log_memory,
+        'subspace_dim' : args.subspace_dim,
+        'eps' : args.eps
+    }
 
     # prepare relevant matrices
-    U = numpy.identity(10) #### PLACEHOLDERS
-    X_0 = numpy.identity(100) #### PLACEHOLDERS
+    if data.T.shape[1] < data.T.shape[0]:
+        V,S,UH  = numpy.linalg.svd(data.T)
+        U = UH.T.conj() 
+    else:
+        U,S,VH = numpy.linalg.svd(data)
+        V = VH.T.conj() 
+    S = numpy.diag(S)
 
-    X = data[:,:-1]
-    Y = data[:,1:]
+    V = V[:,:args.subspace_dim]
+    S = S[:args.subspace_dim,:args.subspace_dim]
+    U = U[:,:args.subspace_dim]
+    M = S @ V.T
+    
+    X, Y = M[:,:-1], M[:,1:]
 
     # learn SOC model
     t_0 = time.time()
@@ -132,7 +137,7 @@ def main():
         matrices = {
             'A' : A,
             'U' : U,
-            'X_0' : X_0
+            'X_0' : X[:,0]
         }
 
         numpy.savez(
