@@ -107,12 +107,18 @@ def main():
     # learn SOC model
     t_0 = time.time()
     A, mem = soc.learn_stable_soc(X=X, Y=Y, **params)
-    # A, mem = numpy.identity(X.shape[0]), numpy.nan
     t_1 = time.time()
     
     # compute least-squares error
+    A_ls = Y @ numpy.linalg.pinv(X)
     ls_error = utilities.adjusted_frobenius_norm(
-        X=Y - Y @ numpy.linalg.pinv(X) @ X)
+        X=Y - A_ls @ X)
+
+    # check if LS solution is stable
+    try:
+        ls_max_eig = utiltiies.get_max_abs_eigval(X=A_ls)
+    else:
+        ls_max_eig = None
 
     # compute frobenius norm reconstruction error
     soc_error = numpy.nan
@@ -126,7 +132,8 @@ def main():
     results = {
         'time' : t_1 - t_0,
         'err' : perc_error,
-        'mem' : mem
+        'mem' : mem,
+        'ls_max_eig' : ls_max_eig
     }
     with open(f'{args.save_dir}{seq_name}_results.json', 'w') as f:
         json.dump(results, f)
