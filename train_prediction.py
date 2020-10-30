@@ -8,7 +8,7 @@ import numpy
 
 import utilities
 
-import soc
+import engine
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -37,6 +37,11 @@ def parse_args():
         type=float, 
         default=10e-11,
         help='epsilon threshold for deciding stability')
+    parser.add_argument(
+        '--time_limit', 
+        type=int, 
+        default=1800,
+        help='time duration (in sec) after which to terminate program')
 
     # logging arguments
     parser.add_argument(
@@ -84,6 +89,7 @@ def main():
     # get algorithm parameters
     params = {
         'log_memory' : args.log_memory,
+        'time_limit' : args.time_limit,
         'subspace_dim' : args.subspace_dim,
         'eps' : args.eps
     }
@@ -106,7 +112,7 @@ def main():
 
     # learn SOC model
     t_0 = time.time()
-    A, mem = soc.learn_stable_soc(X=X, Y=Y, **params)
+    A, mem = engine.learn_stable_soc(X=X, Y=Y, **params)
     t_1 = time.time()
     
     # compute least-squares error
@@ -117,7 +123,7 @@ def main():
     # check if LS solution is stable
     try:
         ls_max_eig = utiltiies.get_max_abs_eigval(X=A_ls)
-    else:
+    except:
         ls_max_eig = None
 
     # compute frobenius norm reconstruction error
