@@ -26,15 +26,19 @@ def adjusted_frobenius_norm(X: numpy.ndarray) -> float:
     """
     return numpy.linalg.norm(X)**2/2
 
-def get_numpy_memory_usage():
-    """
-    Computes memory used by NumPy arrays at call time. Fetches
-    the size (in bytes) of all objects of type numpy.ndarray
-    stored in `globals()`, sums their sizes and converts to MBs.
-    """
-    object_mems = [value.nbytes for _, value in globals().items() if isinstance(value, numpy.ndarray)]
-    mbs_used = sum(object_mems)/1e6
-    return round(mbs_used, 3)
+def adjusted_modulo(x, div=100):
+    result = (x % 100) 
+    return result + (not result) * 100
+
+# def get_numpy_memory_usage():
+#     """
+#     Computes memory used by NumPy arrays at call time. Fetches
+#     the size (in bytes) of all objects of type numpy.ndarray
+#     stored in `globals()`, sums their sizes and converts to MBs.
+#     """
+#     object_mems = [value.nbytes for _, value in locals().items() if isinstance(value, numpy.ndarray)]
+#     mbs_used = sum(object_mems)/1e6
+#     return round(mbs_used, 3)
 
 def project_invertible(M, eps):
     """
