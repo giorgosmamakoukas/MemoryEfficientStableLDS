@@ -121,10 +121,7 @@ def main():
         X=Y - A_ls @ X)
 
     # check if LS solution is stable
-    try:
-        ls_max_eig = utiltiies.get_max_abs_eigval(X=A_ls)
-    except:
-        ls_max_eig = None
+    ls_max_eig = utilities.get_max_abs_eigval(X=A_ls)
 
     # compute frobenius norm reconstruction error
     soc_error = numpy.nan
@@ -143,7 +140,6 @@ def main():
     }
     with open(f'{args.save_dir}{seq_name}_results.json', 'w') as f:
         json.dump(results, f)
-
 
     # optionally store matrices for study/reconstruction
     if args.store_matrices:
