@@ -1,6 +1,6 @@
 # Data Preparation
 
-In this page we show how to prepare the data in the format necessary for running our algorithms. The code has been tested in `Python 3.7.5`.
+In this page we show you how to prepare the data in the format necessary for running our algorithms. The code has been tested for `Python 3.7.5` in a MacOS operating system.
 
 
 ## Requirements
@@ -10,7 +10,11 @@ Pillow==7.1.1
 scipy==1.4.1
 numpy==1.18.0
 ```
-You may need to install an `ffmpeg` [package](https://ffmpeg.org/) in order to be able to run `opencvpython`.
+You may need to install an `ffmpeg` [package](https://ffmpeg.org/) in order to be able to run the relevant `opencvpython` functions. If you are using a MacOS machine and are using `Homebrew` as your package manager, you can easily install `ffmpeg` using the following command:
+
+```
+brew install ffmpeg
+```
 
 ## Prepare data from `.mat` format
 
@@ -22,7 +26,7 @@ python convert_mat_to_sequences.py
 	--save_dir /dir/to/save/results/
 ```
 
-The `--data` command line argument expects the path to the `.mat` containing the raw UCLA or UCSD dataset, and `--save_dir` is the directory in which you want to save the results (it will be created if it does not exist).
+The `--data` command line argument expects the path to the `.mat` file containing the raw UCLA or UCSD dataset (see `../data/` directory for how to obtain them), and `--save_dir` is the directory in which you want to save the results (it will be created if it does not exist).
 
 ## Prepare data from video files
 
