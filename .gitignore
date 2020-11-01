@@ -131,3 +131,10 @@ dmypy.json
 # OS specific
 *.DS_Store
 
+# Data files
+*.npy
+*.txt
+*.json
+
+# Interactive notebooks
+*.ipynb
