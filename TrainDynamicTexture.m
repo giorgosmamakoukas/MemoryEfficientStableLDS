@@ -2,7 +2,6 @@ clear;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set configuration options %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 numberSequences = 200; % number of frame sequences to be used
 folder_name = 'results'; % directory to save results (will be created)
@@ -19,6 +18,8 @@ options.maxiter = 500000;
 options.display = 0;
     
 machine_tolerance = 10e-11;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % add data_path to working directory
 addpath(data_path);
@@ -49,21 +50,19 @@ for dim_i = 1:length(DIMS)
         % load frame sequence i
         load(name)
         P = im2double(data);
-
         Pnew = P';
 
-        % run SVD on Hankel matrix
+        % get SVD decomposition
         if size(Pnew,2) < size(Pnew,1)
             [V,S,U] = svd(Pnew,0);
         else
             [U,S,V] = svd(Pnew',0);
         end
 
-        % Subspace 
+        % slice SVD matrices
         V = V(:,1:n);
         S = S(1:n,1:n);
         U = U(:,1:n);
-
         M = S*V';
 
         % create algorithm input matrices
