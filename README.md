@@ -12,15 +12,18 @@ The `master` branch of this repository contains the code that we used to generat
 6. [Troubleshooting](#troubleshooting)
 
 ## Datasets
-To get the datasets, read the instructions in the `data` directory. The data for the Franka Emika Panda experiments is contained in the `FrankaLDS` directory. 
+
+To get the datasets used for our experiments, read the instructions in the `data` directory.
 
 ## Data Preparation
 
-To prepare the datasets for the UCLA, UCSD and DynTex benchmarks, follow the instructions in the `prepare_data` directory.
+To prepare the datasets for the UCLA, UCSD and DynTex prediction experiments, follow the instructions in the `prepare_data` directory.
 
 ## Dynamical Texture Experiments
 
-To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need to run the `ReconstructImage.m` file. **NOTE**: you will need to set the configuration options at the top of the file so that it can work on your particular system.
+To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need to run the `ReconstructImage.m` file. 
+
+**NOTE**: you will need to set some configuration options at the top of the `ReconstructImage.m` file so that it can work on your particular system.
 
 ## Franka Emika Panda Experiments
 
@@ -44,4 +47,4 @@ If you find this project useful, consider
 ```
 
 # Troubleshooting
-If you face any issues with our code or are unable to reproduce our results, please submit a Github isue and we will do our best to address it promptly.
+If you face any issues with our code or are unable to reproduce our results, please submit a Github issue and we will do our best to address it promptly.
