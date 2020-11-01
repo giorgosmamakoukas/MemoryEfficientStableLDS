@@ -7,7 +7,6 @@ import os
 import numpy
 
 import utilities
-
 import engine
 
 def parse_args():
@@ -16,10 +15,20 @@ def parse_args():
 
     # i/o arguments
     parser.add_argument(
-        '--data', 
+        '--X', 
         type=str, 
         required=True,
-        help='path to file containing training data')
+        help='path to file containing X matrix')
+    parser.add_argument(
+        '--Y', 
+        type=str, 
+        required=True,
+        help='path to file containing Y matrix')
+    parser.add_argument(
+        '--sample_id', 
+        type=str, 
+        default='sample',
+        help='identifying name for output files')
     parser.add_argument(
         '--save_dir', 
         type=str, 
@@ -27,11 +36,6 @@ def parse_args():
         help='directory in which to store results')
 
     # training arguments
-    parser.add_argument(
-        '--subspace_dim', 
-        type=int, 
-        required=True,
-        help='embedding dimension for state-transition matrix')
     parser.add_argument(
         '--eps', 
         type=float, 
@@ -49,7 +53,7 @@ def parse_args():
         action='store_true',
         help='whether to record memory required by objects')
     parser.add_argument(
-        '--store_matrices', 
+        '--store_matrix', 
         action='store_true',
         help='whether to record memory required by objects')
 
@@ -71,44 +75,24 @@ def main():
     # add trailing / to input and output directories if necessary
     if not args.save_dir.endswith('/'):
         args.save_dir += '/'
-    args.save_dir += str(args.subspace_dim) + '/'
 
     # make target directory if it does not exist
     os.makedirs(args.save_dir, exist_ok=True)
-
-    # get sequence name
-    seq_name = args.data.split('/')[-1].split('.')[0]
 
     # set random seeds
     random.seed(args.seed)
     numpy.random.seed(args.seed)
 
     # read data
-    data = numpy.load(args.data)
+    X = numpy.load(args.X)
+    Y = numpy.load(args.Y)
 
     # get algorithm parameters
-    params = {
+    params = { 
         'log_memory' : args.log_memory,
         'time_limit' : args.time_limit,
-        'subspace_dim' : args.subspace_dim,
         'eps' : args.eps
     }
-
-    # prepare relevant matrices
-    if data.T.shape[1] < data.T.shape[0]:
-        V,S,UH  = numpy.linalg.svd(data.T)
-        U = UH.T.conj() 
-    else:
-        U,S,VH = numpy.linalg.svd(data)
-        V = VH.T.conj() 
-    S = numpy.diag(S)
-
-    V = V[:,:args.subspace_dim]
-    S = S[:args.subspace_dim,:args.subspace_dim]
-    U = U[:,:args.subspace_dim]
-    M = S @ V.T
-    
-    X, Y = M[:,:-1], M[:,1:]
 
     # learn SOC model
     t_0 = time.time()
@@ -138,20 +122,14 @@ def main():
         'mem' : mem,
         'ls_max_eig' : ls_max_eig
     }
-    with open(f'{args.save_dir}{seq_name}_results.json', 'w') as f:
+    with open(f'{args.save_dir}{args.sample_id}_results.json', 'w') as f:
         json.dump(results, f)
 
-    # optionally store matrices for study/reconstruction
-    if args.store_matrices:
-        matrices = {
-            'A' : A,
-            'U' : U,
-            'X_0' : X[:,0]
-        }
-
-        numpy.savez(
-            file=f'{args.save_dir}{seq_name}_matrices.npz',
-            **matrices)
+    # optionally store state-transition matrix
+    if args.store_matrix:
+        numpy.save(
+            file=f'{args.save_dir}{args.sample_id}_amatrix.npy',
+            arr=A)
 
 if __name__ == '__main__':
 	main()
