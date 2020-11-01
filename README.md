@@ -15,3 +15,19 @@ To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need
 ## Learning and control on Franka Emika Panda
 
 For our results of Franka Emika Panda, consult the `FrankaLDS` directory.
+
+# Citing
+
+If you find this project useful, we encourage you to
+
+- Star this repository ⭐
+- Cite the paper
+
+```
+@inproceedings{mamakoukas2020_memEfficientLDS,
+  title={Memory-Efficient Learning of Stable Linear Dynamical Systems for Prediction and Control},
+  author={Mamakoukas, Giorgos and Xherija, Orest and Murphey, Todd},
+  booktitle={Neural Information Processing Systems (NeurIPS)},
+  year={2020}
+}
+```
