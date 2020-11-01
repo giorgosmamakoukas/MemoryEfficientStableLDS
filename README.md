@@ -21,21 +21,21 @@ To prepare the datasets for the UCLA, UCSD and DynTex prediction experiments, fo
 
 ## Dynamical Texture Experiments
 
-To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need to run the `ReconstructImage.m` file. 
+To reproduce our results for the UCLA, UCSD and DynTex benchmarks, you will need to run the `TrainDynamicTexture.m` file. 
 
-**NOTE**: you will need to set some configuration options at the top of the `ReconstructImage.m` file so that it can work on your particular system.
+**NOTE**: you will need to set some configuration options at the top of the `TrainDynamicTexture.m` file so that it can work on your particular system.
 
 ## Franka Emika Panda Experiments
 
-For our results of Franka Emika Panda, consult the `FrankaLDS` directory.
+To reproduce our results from the simulations and experiments with the Franka Emika Panda robotic arm manipulator, consult the `FrankaLDS` directory.
 
 # Citing
 
 If you find this project useful, consider
 
-- Starring this repository ⭐
-- Watching this repository for updates 
-- Citing our paper
+- starring this repository ⭐
+- watching this repository for updates 
+- citing our paper (complete citation available after the publication of the NeurIPS 2020 proceedings)
 
 ```
 @inproceedings{mamakoukas2020_memEfficientLDS,
