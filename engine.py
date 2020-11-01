@@ -13,8 +13,6 @@ def initialize_soc(X,Y):
     debug
     - project_psd has options.astab arg being used
     in MATLAB
-    - do we need inverse of S in e_old?
-    - check all pseudo-inverses for X, Y swapped
     """
     S = numpy.identity(len(X))
     S_inv = S
@@ -54,7 +52,7 @@ def refine_soc_solution(X, Y, S, O, C, **kwargs):
     e_t = e_0
     S_inv = numpy.linalg.inv(a=S)
     A = S_inv @ O @ C @ S  
-    A_ls = X @ numpy.linalg.pinv(Y)
+    A_ls = Y @ numpy.linalg.pinv(X)
     
     A_new = A + e_0 * A_ls
     grad = A_ls - A
@@ -76,7 +74,6 @@ def refine_soc_solution(X, Y, S, O, C, **kwargs):
 def learn_stable_soc(X,Y, **kwargs):
 
     """
-    NOTE: Change Yb, Ys, Yu to appropriate SOC names
     NOTE: Check that all kwargs of all functions are provided correctly
     NOTE: Error about termination conditions
     """
@@ -96,7 +93,7 @@ def learn_stable_soc(X,Y, **kwargs):
     nA2 = utilities.adjusted_frobenius_norm(Y - A_ls @ X)
     e_old, S, O, C = initialize_soc(X,Y)
 
-    Ys, Yu, Yb = S, O, C
+    Ys, Yo, Yc = S, O, C
     
     i = 1
     restart_i = True
@@ -113,8 +110,8 @@ def learn_stable_soc(X,Y, **kwargs):
         inneriter = 1
         
         Sn = Ys - S_grad * step
-        On = Yu - O_grad * step
-        Cn = Yb - C_grad * step
+        On = Yo - O_grad * step
+        Cn = Yc - C_grad * step
         
         Sn, On, Cn = soc.project_to_feasible(Sn, On, Cn, **kwargs)
         
@@ -124,8 +121,8 @@ def learn_stable_soc(X,Y, **kwargs):
         while e_new > e_old and inneriter <= lsitermax:
             
             Sn = Ys - S_grad * step
-            On = Yu - O_grad * step
-            Cn = Yb - C_grad * step
+            On = Yo - O_grad * step
+            Cn = Yc - C_grad * step
             
             Sn, On, Cn = soc.project_to_feasible(Sn, On, Cn, **kwargs)
         
@@ -156,7 +153,7 @@ def learn_stable_soc(X,Y, **kwargs):
             if restart_i:
                 restart_i = False
                 alpha = kwargs.get('alpha', 0.5)
-                Ys, Yu, Yb, e_new = S, O, C, e_old
+                Ys, Yo, Yc, e_new = S, O, C, e_old
             else:
                 break
         else:
@@ -164,8 +161,8 @@ def learn_stable_soc(X,Y, **kwargs):
             if gradient:
                 beta = 0
             Ys = Sn + beta * (Sn - S)
-            Yu = On + beta * (On - O)
-            Yb = Cn + beta * (Cn - C)
+            Yo = On + beta * (On - O)
+            Yc = Cn + beta * (Cn - C)
             
             S, O, C = Sn, On, Cn
         i+=1
@@ -190,8 +187,5 @@ def learn_stable_soc(X,Y, **kwargs):
         object_mems = [value.nbytes for _, value in locals().items() if isinstance(value, numpy.ndarray)]
         mbs_used = sum(object_mems)/1e6
         mem = round(mbs_used, 3)
-
-    # just for debugging
-    #A, mem = numpy.identity(X.shape[0]), numpy.nan
 
     return A, mem
