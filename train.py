@@ -119,7 +119,6 @@ def main():
     if args.U:
         U = numpy.load(args.U)
 
-
     # get algorithm parameters
     params = { 
         'log_memory' : args.log_memory,
