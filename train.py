@@ -45,7 +45,7 @@ def parse_args():
         '--eps', 
         type=float, 
         default=1e-12,
-        help='epsilon threshold for deciding stability')
+        help='numerical precision threshold')
     parser.add_argument(
         '--stability_relaxation', 
         type=float, 
@@ -84,7 +84,7 @@ def parse_args():
     parser.add_argument(
         '--store_matrix', 
         action='store_true',
-        help='whether to record memory required by objects')
+        help='whether to store state and control matrices')
 
     # reproducibility arguments
     parser.add_argument(
