@@ -134,7 +134,9 @@ dmypy.json
 # Data files
 *.npy
 *.txt
+!requirements.txt
 *.json
 
 # Interactive notebooks
 *.ipynb
+
