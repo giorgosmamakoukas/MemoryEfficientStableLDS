@@ -84,7 +84,7 @@ def parse_args():
     parser.add_argument(
         '--store_matrix', 
         action='store_true',
-        help='whether to store state and control matrices')
+        help='whether to store state and control matrices to disk')
 
     # reproducibility arguments
     parser.add_argument(
@@ -145,7 +145,7 @@ def main():
         A_ls = Y @ numpy.linalg.pinv(X)
         pred = A_ls @ X
     else:
-        XU = np.concatenate((X, U), axis=0)
+        XU = numpy.concatenate((X, U), axis=0)
         AB_ls = Y @ numpy.linalg.pinv(XU)
         pred = AB_ls @ XU
         A_ls = AB_ls[:X.shape[0], :X.shape[0]]
