@@ -29,7 +29,7 @@ This will produce the following output in directory `results/`
 - a `.npy` file `sample_amatrix.json` containing the state matrix `A`
 - a `.npy` file `sample_bmatrix.json` containing the state matrix `B`
 
-Note that the `--U` command-line argument is optional. If you do not procide it, the algorithm will learn a linear dynamical system without inputs and will consequently not output matrix `sample_bmatrix.npy`.
+Note that the `--U` command-line argument is optional. If you do not provide it, the algorithm will learn a linear dynamical system without inputs and will consequently not output matrix `sample_bmatrix.npy`.
 
 ## Advanced configuration options
 We have included a number of more advanced configuration options that you can provide in order to have more control over the learning process. They are briefly summarized below:
