@@ -134,13 +134,24 @@ def main():
 
     # learn SOC model
     t_0 = time.time()
-    A, mem = engine.learn_stable_soc(X=X, Y=Y, **params)
+    if U is None:
+        A, mem = engine.learn_stable_soc(X=X, Y=Y, **params)
+    else:
+        A, B, mem = engine.learn_stable_soc_with_inputs(X=X, Y=Y, U=U, **params)
     t_1 = time.time()
     
     # compute least-squares error
-    A_ls = Y @ numpy.linalg.pinv(X)
+    if U is None:
+        A_ls = Y @ numpy.linalg.pinv(X)
+        pred = A_ls @ X
+    else:
+        XU = np.concatenate((X, U), axis=0)
+        AB_ls = Y @ numpy.linalg.pinv(XU)
+        pred = AB_ls @ XU
+        A_ls = AB_ls[:X.shape[0], :X.shape[0]]
+
     ls_error = utilities.adjusted_frobenius_norm(
-        X=Y - A_ls @ X)
+        X=Y - pred)
 
     # check if LS solution is stable
     ls_max_eig = utilities.get_max_abs_eigval(X=A_ls)
@@ -148,7 +159,11 @@ def main():
     # compute frobenius norm reconstruction error
     soc_error = numpy.nan
     if utilities.get_max_abs_eigval(A) <= 1 + args.eps:
-        soc_error = utilities.adjusted_frobenius_norm(X=Y - A @ X)
+        if U is None:
+            soc_error = utilities.adjusted_frobenius_norm(X=Y - A @ X)
+        else:
+            soc_error = utilities.adjusted_frobenius_norm(X=Y - A @ X - B @ U)
+
 
     # compute percentage error
     perc_error = 100*(soc_error - ls_error)/ls_error
@@ -168,6 +183,10 @@ def main():
         numpy.save(
             file=f'{args.save_dir}{args.sample_id}_amatrix.npy',
             arr=A)
+        if U is not None:
+            numpy.save(
+                file=f'{args.save_dir}{args.sample_id}_bmatrix.npy',
+                arr=B)
 
 if __name__ == '__main__':
 	main()
