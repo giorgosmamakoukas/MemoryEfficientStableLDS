@@ -318,7 +318,7 @@ def learn_stable_soc_with_inputs(X,Y, U, **kwargs):
             break
         alpha_prev = alpha
 
-        S_grad, O_grad, C_grad, B_grad = soc.get_gradients_with_inputs(X, Y, B, S, O, C)
+        S_grad, O_grad, C_grad, B_grad = soc.get_gradients_with_inputs(X, Y, U, B, S, O, C)
         
         step = kwargs.get('step', 100)
         inneriter = 1

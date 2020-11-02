@@ -28,6 +28,7 @@ def get_gradients(
 def get_gradients_with_inputs(
     X: numpy.ndarray, 
     Y: numpy.ndarray, 
+    U: numpy.ndarray,
     B: numpy.ndarray,
     S: numpy.ndarray, 
     O: numpy.ndarray, 
