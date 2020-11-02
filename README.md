@@ -24,24 +24,24 @@ python train.py \
     --log_memory \
     --store_matrix 
 ```
-This will produce the following output in directory `results/`
+This will produce the following output in directory `results/`:
 - a `.json` file `sample_results.json` containing the execution time, memory usage, least-squares maximum absolute eigenvalue and relative error
 - a `.npy` file `sample_amatrix.json` containing the state matrix `A`
-- a `.npy` file `sample_bmatrix.json` containing the state matrix `B`
+- a `.npy` file `sample_bmatrix.json` containing the control matrix `B`
 
 Note that the `--U` command-line argument is optional. If you do not provide it, the algorithm will learn a linear dynamical system without inputs and will consequently not output matrix `sample_bmatrix.npy`.
 
 ## Advanced configuration options
 We have included a number of more advanced configuration options that you can provide in order to have more control over the learning process. They are briefly summarized below:
 
-- `--sample_id`: identifying name for output files; defaults to `sample`
+- `--sample_id`: identifying name for output files; defaults to `'sample'`
 - `--eps`: numerical precision threshold; defaults to `1e-12`
 - `--stability_relaxation`: amount by which to relax stablity threshold; defaults to `0`
 - `--time_limit`: time duration (in sec) after which to terminate program; defaults to `1800`
 - `--step_size_factor`: factor by which to reduce step size in fast-gradient method; defaults to `5`
 - `--fgm_max_iter`: maximum number of times to apply fast-gradient method; defaults to `20`
 - `--alpha`: fast-gradient method tuning parameter; defaults to `0.5`
-- `--conjugate_gradient`: whether to use conjugate gradient method; `False` if argumnt is absent
-- `--log_memory`: whether to record memory required by objects; `False` if argumnt is absent
+- `--conjugate_gradient`: whether to use conjugate gradient method; `False` if argument is absent
+- `--log_memory`: whether to record memory required by objects; `False` if argument is absent
 - `--store_matrix`: whether to store state and control matrices to disk; `False` if argument is absent
 - `--seed`: random seed for reproducibility
