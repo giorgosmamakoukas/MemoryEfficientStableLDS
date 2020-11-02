@@ -11,7 +11,11 @@ def get_max_abs_eigval(
     computation does not converge. X does not have to 
     be symmetric.
     """
-    eigval_operator = numpy.linalg.eigvalsh if is_symmetric else numpy.linalg.eigvals
+    eigval_operator = (
+        numpy.linalg.eigvalsh 
+        if is_symmetric 
+        else numpy.linalg.eigvals)
+
     try: 
         eig_max = max(abs(eigval_operator(X)))
     except:
@@ -29,16 +33,6 @@ def adjusted_frobenius_norm(X: numpy.ndarray) -> float:
 def adjusted_modulo(x, div=100):
     result = (x % 100) 
     return result + (not result) * 100
-
-# def get_numpy_memory_usage():
-#     """
-#     Computes memory used by NumPy arrays at call time. Fetches
-#     the size (in bytes) of all objects of type numpy.ndarray
-#     stored in `globals()`, sums their sizes and converts to MBs.
-#     """
-#     object_mems = [value.nbytes for _, value in locals().items() if isinstance(value, numpy.ndarray)]
-#     mbs_used = sum(object_mems)/1e6
-#     return round(mbs_used, 3)
 
 def project_invertible(M, eps):
     """

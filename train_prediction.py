@@ -25,6 +25,11 @@ def parse_args():
         required=True,
         help='path to file containing Y matrix')
     parser.add_argument(
+        '--U', 
+        type=str, 
+        default='',
+        help='path to file containing U matrix')
+    parser.add_argument(
         '--sample_id', 
         type=str, 
         default='sample',
@@ -39,13 +44,37 @@ def parse_args():
     parser.add_argument(
         '--eps', 
         type=float, 
-        default=10e-11,
+        default=1e-12,
         help='epsilon threshold for deciding stability')
+    parser.add_argument(
+        '--stability_relaxation', 
+        type=float, 
+        default=0,
+        help='whether to relax stability threshold by given amount')
     parser.add_argument(
         '--time_limit', 
         type=int, 
         default=1800,
         help='time duration (in sec) after which to terminate program')
+    parser.add_argument(
+        '--step_size_factor', 
+        type=int, 
+        default=5,
+        help='factor by which to reduce step size')
+    parser.add_argument(
+        '--fgm_max_iter', 
+        type=int, 
+        default=20,
+        help='maximum number of times to apply fast gradient method')
+    parser.add_argument(
+        '--alpha', 
+        type=float, 
+        default=0.5,
+        help='fast gradient method tuning parameter')
+    parser.add_argument(
+        '--conjugate_gradient', 
+        action='store_true',
+        help='whether to use conjugate gradient method')
 
     # logging arguments
     parser.add_argument(
@@ -86,10 +115,19 @@ def main():
     # read data
     X = numpy.load(args.X)
     Y = numpy.load(args.Y)
+    U = None
+    if args.U:
+        U = numpy.load(args.U)
+
 
     # get algorithm parameters
     params = { 
         'log_memory' : args.log_memory,
+        'conjugate_gradient': args.conjugate_gradient,
+        'step_size_factor': args.step_size_factor,
+        'fgm_max_iter': args.fgm_max_iter,
+        'alpha' : args.alpha,
+        'stability_relaxation': args.stability_relaxation,
         'time_limit' : args.time_limit,
         'eps' : args.eps
     }

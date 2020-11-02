@@ -8,30 +8,36 @@ import soc
 import utilities
 
 
-def initialize_soc(X,Y):
+def initialize_soc(X,Y, **kwargs):
     """
-    debug
-    - project_psd has options.astab arg being used
-    in MATLAB
+    DEBUG
     """
+
+    stability_relaxation = kwargs.get('stability_relaxation', 0)
+
     S = numpy.identity(len(X))
     S_inv = S
     A_ls = Y @ numpy.linalg.pinv(X) 
 
     O,C = scipy.linalg.polar(a=A_ls, side='right')
-    eig_max = utilities.get_max_abs_eigval(O @ C)
+    eig_max = utilities.get_max_abs_eigval(O @ C, is_symmetric=False)
     
-    if eig_max > 1:
-        C = utilities.project_psd(C, eps=0, delta=1)
-        e_old = utilities.adjusted_frobenius_norm(Y - (S_inv @ O @ C @ S) @ X)
+    if eig_max > 1 - stability_relaxation:
+        C = utilities.project_psd(Q=C, eps=0, delta=1)
+        e_old = utilities.adjusted_frobenius_norm(
+            X=Y - (S_inv @ O @ C @ S) @ X)
     else:
-        e_old = utilities.adjusted_frobenius_norm(Y - A_ls @ X) 
+        e_old = utilities.adjusted_frobenius_norm(X=Y - A_ls @ X) 
     
     eig_max = max(1, eig_max)
     A_stab = A_ls / eig_max
-    _,S_,O_,C_ = soc.checkdstable(0.9999*A_stab)
+    _,S_,O_,C_ = soc.checkdstable(
+        A=0.9999*A_stab, 
+        stab_relax=stability_relaxation)
     S_inv_ = numpy.linalg.inv(a=S_)
-    e_temp = utilities.adjusted_frobenius_norm(Y - (S_inv_ @ O_ @ C_ @ S_) @ X)
+    
+    e_temp = utilities.adjusted_frobenius_norm(
+        X=Y - (S_inv_ @ O_ @ C_ @ S_) @ X)
     if e_temp < e_old:
         S, O, C = S_, O_, C_
         e_old = e_temp
@@ -58,12 +64,12 @@ def refine_soc_solution(X, Y, S, O, C, **kwargs):
     grad = A_ls - A
     
     # get initial max abs eigenvalue
-    eig_max = utilities.get_max_abs_eigval(A_new)
+    eig_max = utilities.get_max_abs_eigval(A_new, is_symmetric=False)
     
-    while eig_max <= 1 and utilities.adjusted_frobenius_norm(A_new - A_ls) > 0.01:
+    while eig_max <= 1 and utilities.adjusted_frobenius_norm(X=A_new - A_ls) > 0.01:
         e_t += delta
         A_new = A + e_t * grad
-        eig_max = utilities.get_max_abs_eigval(A_new)
+        eig_max = utilities.get_max_abs_eigval(A_new, is_symmetric=False)
     
     if e_t != e_0:
         A = A + (e_t - delta) * grad
@@ -74,24 +80,23 @@ def refine_soc_solution(X, Y, S, O, C, **kwargs):
 def learn_stable_soc(X,Y, **kwargs):
 
     """
-    NOTE: Check that all kwargs of all functions are provided correctly
     NOTE: Error about termination conditions
     """
     
     time_limit = kwargs.get('time_limit', 1800)
     alpha = kwargs.get('alpha', 0.5)
-    lsparam = kwargs.get('lsparam', 5)
-    lsitermax = kwargs.get('lsitermax', 20)
-    gradient = kwargs.get('gradient', False)
+    step_size_factor = kwargs.get('step_size_factor', 5)
+    fgm_max_iter = kwargs.get('fgm_max_iter', 20)
+    conjugate_gradient = kwargs.get('conjugate_gradient', False)
     log_memory = kwargs.get('log_memory', True)
+    eps = kwargs.get('eps', 1e-12)
 
 
     e100 = [None] * 100
     
-    # add initialization method here
     A_ls = Y @ numpy.linalg.pinv(X) 
-    nA2 = utilities.adjusted_frobenius_norm(Y - A_ls @ X)
-    e_old, S, O, C = initialize_soc(X,Y)
+    nA2 = utilities.adjusted_frobenius_norm(X=Y - A_ls @ X)
+    e_old, S, O, C = initialize_soc(X,Y, **kwargs)
 
     Ys, Yo, Yc = S, O, C
     
@@ -116,9 +121,10 @@ def learn_stable_soc(X,Y, **kwargs):
         Sn, On, Cn = soc.project_to_feasible(Sn, On, Cn, **kwargs)
         
         Sn_inv = numpy.linalg.inv(a=Sn)
-        e_new = utilities.adjusted_frobenius_norm(Y - (Sn_inv @ On @ Cn @ Sn) @ X)
+        e_new = utilities.adjusted_frobenius_norm(
+            X=Y - (Sn_inv @ On @ Cn @ Sn) @ X)
 
-        while e_new > e_old and inneriter <= lsitermax:
+        while e_new > e_old and inneriter <= fgm_max_iter:
             
             Sn = Ys - S_grad * step
             On = Yo - O_grad * step
@@ -127,7 +133,8 @@ def learn_stable_soc(X,Y, **kwargs):
             Sn, On, Cn = soc.project_to_feasible(Sn, On, Cn, **kwargs)
         
             Sn_inv = numpy.linalg.inv(a=Sn)
-            e_new = utilities.adjusted_frobenius_norm(Y - (Sn_inv @ On @ Cn @ Sn) @ X)
+            e_new = utilities.adjusted_frobenius_norm(
+                X=Y - (Sn_inv @ On @ Cn @ Sn) @ X)
 
             try:
                 assert (e_new < e_old) and (e_new > prev_error)
@@ -142,7 +149,7 @@ def learn_stable_soc(X,Y, **kwargs):
                     break
                 else:
                     prev_error = e_new
-            step /= lsparam
+            step /= step_size_factor
             inneriter += 1
         
         
@@ -158,7 +165,7 @@ def learn_stable_soc(X,Y, **kwargs):
                 break
         else:
             restart_i = True
-            if gradient:
+            if conjugate_gradient:
                 beta = 0
             Ys = Sn + beta * (Sn - S)
             Yo = On + beta * (On - O)
@@ -189,3 +196,10 @@ def learn_stable_soc(X,Y, **kwargs):
         mem = round(mbs_used, 3)
 
     return A, mem
+
+
+
+
+
+def learn_stable_soc_with_inputs(X,Y, U, **kwargs):
+    pass

@@ -25,13 +25,16 @@ def get_gradients(
     
     return S_grad, O_grad, C_grad
 
-def checkdstable(A : numpy.ndarray) -> typing.Tuple[numpy.ndarray, ...]:
+def checkdstable(
+    A : numpy.ndarray,
+    stab_relax: bool) -> typing.Tuple[numpy.ndarray, ...]:
+    
     P = scipy.linalg.solve_discrete_lyapunov(a=A.T, q=numpy.identity(len(A)))
     S = scipy.linalg.sqrtm(A=P)
     S_inv = numpy.linalg.inv(a=S)
     OC = S @ A @ S_inv
     O,C = scipy.linalg.polar(a=OC, side='right')
-    C = utilities.project_psd(C, 0, 1)
+    C = utilities.project_psd(Q=C, eps=0, delta=1-stab_relax)
     return P, S, O, C
 
 def project_to_feasible(
@@ -43,11 +46,12 @@ def project_to_feasible(
     Brief explanation
     """
 
-    eps = kwargs.get('eps', 0)
+    eps = kwargs.get('eps', 1e-12)
+    stability_relaxation = kwargs.get('stability_relaxation', 0)
     
     S = utilities.project_invertible(M=S, eps=eps)
-    eig_max = utilities.get_max_abs_eigval(O @ C)
-    if eig_max > 1:
+    eig_max = utilities.get_max_abs_eigval(O @ C, is_symmetric=False)
+    if eig_max > 1 - stability_relaxation:
         O, _ = scipy.linalg.polar(a=O, side='right')
-        C = utilities.project_psd(C, 0, 1)
+        C = utilities.project_psd(Q=C, eps=0, delta=1-stability_relaxation)
     return S, O, C
