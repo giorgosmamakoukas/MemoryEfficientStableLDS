@@ -19,7 +19,7 @@ python train.py \
     --X /path/to/X.npy \
     --Y /path/to/Y.npy \
     --U /path/to/U.npy \ 
-    --save_dir results/ 
+    --save_dir results/ \
     --seed 2020 \
     --log_memory \
     --store_matrix 
