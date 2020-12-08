@@ -6,5 +6,5 @@ Below you will find links to relevant video animations for the results presented
 - [Fountain](https://drive.google.com/file/d/1d2zLUot7Qu0QoXGTFnp9e5u8404H5FKT/view?usp=sharing)
 - [Control of robotic arm](https://drive.google.com/file/d/1VxX7KP0Xjw8oTdLABvhT3GP_jFa9vstl/view?usp=sharing)
 
-We are including sample code to generate the `steam` animation yourself. Simply run the `animateSteam.m` file and it will produce the `mpeg-4` animation that we have included in the above link. You can make appropriate changes in the file to obtain animations for any of the other sequences (or your own).
+We are including sample code to generate the `steam` animation yourself. Simply run the `animateSteam.m` file and it will produce the `mpeg-4` animation that we have included in the above link. You can make appropriate changes in the file to obtain animations for any of the other sequences (or your own). The file `steam.mat` contains the training data used to obtain the LDS model, which is precomputed and given here in `steamLDS.mat` for ease of use. 
 
