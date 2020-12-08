@@ -1,7 +1,7 @@
 # Learning and control of the Franka robot using stable LDS
 
 1. The directory `controlExperiments` contains: 
-* `Franka_Fig8_exp.mat`, which contains 3 trials of experimentally tracking a figure 8 pattern. The three trials use LQR control developed using a stable LDS model obtained with the SOC algorithm. 
+* `Franka_Fig8_exp.mat`, the results 3 trials of experimentally tracking a figure 8 pattern. The three trials use LQR control developed using a stable LDS model obtained with the SOC algorithm. 
 
 2. The directory `learningLDS` contains the files used to learn stable LDS systems using the experimental Franka data. 
 To do this, simply run the `mainExecution` file, which will generate results in the subdirectory `results/`. 
