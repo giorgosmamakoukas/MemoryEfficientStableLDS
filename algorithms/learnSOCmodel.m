@@ -58,7 +58,6 @@ e100 = nan(100,1); % Preallocate for speed
     end
 
     % LMI-based initialization
-%     eA = abs(eig(A_ls)); 
     maxeA = max(1,eA); 
     Astab = (A_ls)/maxeA; 
     [~,Stemp,Otemp,Ctemp] = checkdstable(0.9999*Astab); 
